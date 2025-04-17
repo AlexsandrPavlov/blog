@@ -1,0 +1,26 @@
+.container_post {
+  display: flex;
+  flex-direction: column;
+  width: 938px;
+  height: 140px;
+  background: #ffffff;
+  border-radius: 5px;
+  box-sizing: border-box;
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+  padding: 10px;
+}
+.post_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.post_header_user {
+  display: flex;
+  flex-direction: row;
+}
+.post_header_user_info {
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+}
