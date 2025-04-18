@@ -8,7 +8,8 @@ export const Post = () => {
       <section className={style.post_header}>
         <section className={style.post_header_about}>
           <a className={style.post_title}>Some article title</a>
-          <HeartFilled style={{color: 'red'}} className={style.icon_like} />
+          {/* <HeartFilled style={{color: 'red'}} className={style.icon_like} /> */}
+          <HeartOutlined className={style.icon_like} />
           <span className={style.post_likes}>12</span>
           <br />
           <Tag className={style.tag_name}>Tag 1</Tag>
