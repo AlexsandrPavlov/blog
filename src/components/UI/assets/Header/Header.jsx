@@ -1,4 +1,4 @@
-import {Auth} from '../Auth/Auth';
+import {Auth} from './AuthBlock/Auth';
 import style from './Header.module.css';
 
 export const Header = () => {

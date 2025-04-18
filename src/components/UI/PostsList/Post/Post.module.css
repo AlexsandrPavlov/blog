@@ -52,11 +52,24 @@
   line-height: 22px;
   letter-spacing: 0px;
   vertical-align: middle;
+  cursor: pointer;
+}
+.icon_like:hover {
+  color: red;
+}
+.icon_like_disabled {
+  cursor: not-allowed;
 }
 .tag_name {
   font-weight: 400;
   font-size: 12px;
   line-height: 100%;
+  max-width: 70px;
+  padding: 5px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: clip;
+  cursor: pointer;
 }
 
 .user_name {
@@ -92,4 +105,5 @@ p {
   line-height: 22px;
   letter-spacing: 0px;
   color: rgba(0, 0, 0, 0.75);
+  cursor: pointer;
 }
