@@ -1,12 +1,12 @@
 import './App.css';
-import {Header} from './components/UI/assets/Header/Header';
-import {PostList} from './components/UI/PostsList/PostList';
+import {AppRoutes} from './AppRoutes';
 
-export default function App() {
+const App = () => {
   return (
-    <>
-      <Header />
-      <PostList />
-    </>
+    <div className="App">
+      <AppRoutes />
+    </div>
   );
-}
+};
+
+export default App;

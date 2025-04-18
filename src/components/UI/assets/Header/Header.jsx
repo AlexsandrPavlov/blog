@@ -1,5 +1,6 @@
 import {Auth} from './AuthBlock/Auth';
 import style from './Header.module.css';
+import {Link} from 'react-router';
 
 export const Header = () => {
   let displayedName = 'RealWorld Blog';
@@ -7,9 +8,9 @@ export const Header = () => {
     <>
       <div className={style.header}>
         <nav className={style.header__navbar}>
-          <a className={style.link__logo} href="">
+          <Link className={style.link__logo} to="/posts">
             {displayedName}
-          </a>
+          </Link>
           <Auth />
         </nav>
       </div>
