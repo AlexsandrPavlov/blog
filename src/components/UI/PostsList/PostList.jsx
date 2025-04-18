@@ -1,43 +1,24 @@
 import {PaginationPosts} from '../assets/Pagination/Pagination';
 import {Post} from './Post/Post.jsx';
 import style from './PostList.module.css';
-import {useEffect, useState} from 'react';
-import {getArticles} from '../../api/api.js';
+import {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchArticles} from '../../../store/slice/articleSlice.js';
+import {setPage} from '../../../store/slice/paginationSlice.js';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
 
 export const PostList = () => {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [countPosts, setCountPosts] = useState(0);
-  const [offset, setOffset] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const dispatch = useDispatch();
+  const {items: articles, count, loading, error} = useSelector((state) => state.articles);
+  const {currentPage, limit, offset} = useSelector((state) => state.pagination);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      setLoading(true);
-      try {
-        const data = await getArticles({limit: 5, offset: offset});
-        const articles = data.data.articles.map((article) => ({
-          ...article,
-          id: new Date().getTime() + Math.random(),
-        }));
-        setCountPosts(data.data.articlesCount);
-        setArticles(articles);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-        setError('Failed to loading posts', error.message);
-      }
-    };
-
-    fetchArticles();
-  }, [offset]);
+    dispatch(fetchArticles({limit, offset}));
+  }, [dispatch, limit, offset]);
 
   const handlePageChange = (offset, page) => {
-    setCurrentPage(page);
-    setOffset(offset);
+    dispatch(setPage({page}));
   };
 
   return (
@@ -49,9 +30,9 @@ export const PostList = () => {
     (error && <ErrorAlert error={error} />) || (
       <div className={style.posts_wrapper}>
         {articles.map((article) => (
-          <Post key={article.id} {...article} />
+          <Post key={article.slug} {...article} />
         ))}
-        <PaginationPosts countPosts={countPosts} handlePageChange={handlePageChange} currentPage={currentPage} />
+        <PaginationPosts countPosts={count} handlePageChange={handlePageChange} currentPage={currentPage} />
       </div>
     )
   );
