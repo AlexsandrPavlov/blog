@@ -59,6 +59,11 @@
 }
 .icon_like_disabled {
   cursor: not-allowed;
+  color: gray;
+}
+.icon_like_disabled:hover {
+  cursor: not-allowed;
+  color: gray;
 }
 .tag_name {
   font-weight: 400;

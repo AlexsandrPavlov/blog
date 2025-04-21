@@ -48,5 +48,18 @@ export const deleteArticle = (token, slug) =>
   api.delete(`/articles/${slug}`, {
     headers: {Authorization: `Token ${token}`},
   });
+export const likeArticle = (token, slug) =>
+  api.post(
+    `/articles/${slug}/favorite`,
+    {},
+    {
+      headers: {Authorization: `Token ${token}`},
+    }
+  );
+
+export const unlikeArticle = (token, slug) =>
+  api.delete(`/articles/${slug}/favorite`, {
+    headers: {Authorization: `Token ${token}`},
+  });
 
 export default api;

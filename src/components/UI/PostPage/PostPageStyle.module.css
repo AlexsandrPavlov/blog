@@ -23,9 +23,9 @@
   max-width: 880px;
   max-height: 685px;
   margin-top: 20px;
-  overflow-wrap: break-word; /* Перенос длинных слов */
-  word-wrap: break-word; /* Для совместимости */
-  word-break: break-word; /* Перенос слов */
-  overflow: auto; /* Добавление прокрутки, если содержимое превышает размеры */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow: auto;
   padding: 20px;
 }

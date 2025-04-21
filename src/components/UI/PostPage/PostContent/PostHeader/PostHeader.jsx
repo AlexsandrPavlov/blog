@@ -3,16 +3,25 @@ import style from './PostHeaderStyle.module.css';
 import {Avatar, Tag} from 'antd';
 import {HeartOutlined} from '@ant-design/icons';
 import avatar from '../../../../UI/PostsList/Post/avatar.png';
+import {useSelector} from 'react-redux';
 
 export const PostHeader = (post) => {
-  const {title, description, author, createdAt, tagList, favoritesCount} = post;
+  const {token} = useSelector((state) => state.auth);
+  const {title, description, author, createdAt, tagList, favoritesCount, favorited} = post;
   return (
     <div className={style.container_header}>
       <div className={style.post_header}>
         <section className={style.post_header_about}>
           <h1 className={style.post_title}>{title}</h1>
-          {/* <HeartFilled style={{color: 'red'}} className={style.icon_like} /> */}
-          <HeartOutlined className={style.icon_like} />
+          {token ? (
+            favorited ? (
+              <HeartFilled style={{color: 'red'}} className={style.icon_like} onClick={handleLikeClick} />
+            ) : (
+              <HeartOutlined className={style.icon_like} onClick={handleLikeClick} />
+            )
+          ) : (
+            <HeartOutlined className={`${style.icon_like} ${style.icon_like_disabled}`} />
+          )}
           <span className={style.post_likes}>{favoritesCount}</span>
           <br />
           {tagList.length ? (
