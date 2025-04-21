@@ -49,7 +49,4 @@ export const deleteArticle = (token, slug) =>
     headers: {Authorization: `Token ${token}`},
   });
 
-// Tags endpoint
-export const getTags = () => api.get('/tags');
-
 export default api;

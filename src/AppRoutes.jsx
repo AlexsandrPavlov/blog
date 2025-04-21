@@ -2,6 +2,7 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import {PostList} from './components/UI/PostsList/PostList.jsx';
 import {NotFound} from './components/UI/NotFound/NotFound.jsx';
 import {Header} from './components/UI/assets/Header/Header.jsx';
+import {PostPage} from './components/UI/PostPage/PostPage.jsx';
 
 export const AppRoutes = () => {
   return (
@@ -10,6 +11,7 @@ export const AppRoutes = () => {
       <Routes>
         <Route index element={<PostList />} />
         <Route path="posts" element={<PostList />} />
+        <Route path="post/:slug" element={<PostPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
