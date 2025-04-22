@@ -26,9 +26,26 @@ export const CreatePost = () => {
   });
 
   const [tagInput, setTagInput] = useState('');
+  const [editingTagIndex, setEditingTagIndex] = useState(null); // Индекс редактируемого тега
+  const [originalTagValue, setOriginalTagValue] = useState(''); // Оригинальное значение тега
 
   const handleChange = (e) => {
     const {name, value} = e.target;
+
+    if (name === 'description' && value.length > 120) {
+      setErrors({
+        ...errors,
+        description: 'Description must be 120 characters or less.',
+      });
+      return;
+    }
+    if (name === 'title' && value.length > 50) {
+      setErrors({
+        ...errors,
+        title: ' must be 50 characters or less.',
+      });
+      return;
+    }
     setFormData({
       ...formData,
       [name]: value,
@@ -61,8 +78,16 @@ export const CreatePost = () => {
     e.preventDefault();
 
     const newErrors = {
-      title: !formData.title.trim() ? 'Title is required.' : '',
-      description: !formData.description.trim() ? 'Description is required.' : '',
+      title: !formData.title.trim()
+        ? 'Title is required.'
+        : formData.title.length > 50
+          ? 'Title must be 50 characters or less.'
+          : '',
+      description: !formData.description.trim()
+        ? 'Description is required.'
+        : formData.description.length > 120
+          ? 'Description must be 120 characters or less.'
+          : '',
       body: !formData.body.trim() ? 'Text is required.' : '',
     };
 
@@ -134,7 +159,35 @@ export const CreatePost = () => {
           <div className={styles.tagsList}>
             {formData.tagList.map((tag, index) => (
               <div key={index} className={styles.tag}>
-                <span>{tag}</span>
+                <input
+                  type="text"
+                  value={editingTagIndex === index ? tag : formData.tagList[index]}
+                  onChange={(e) => {
+                    const updatedTags = [...formData.tagList];
+                    updatedTags[index] = e.target.value.slice(0, 12); // Ограничение длины до 12 символов
+                    setFormData({
+                      ...formData,
+                      tagList: updatedTags,
+                    });
+                  }}
+                  onFocus={() => {
+                    setEditingTagIndex(index); // Устанавливаем текущий редактируемый индекс
+                    setOriginalTagValue(tag); // Сохраняем оригинальное значение
+                  }}
+                  onBlur={() => {
+                    if (formData.tagList[index].trim() === '') {
+                      // Если поле пустое, возвращаем оригинальное значение
+                      const updatedTags = [...formData.tagList];
+                      updatedTags[index] = originalTagValue;
+                      setFormData({
+                        ...formData,
+                        tagList: updatedTags,
+                      });
+                    }
+                    setEditingTagIndex(null); // Сбрасываем редактируемый индекс
+                  }}
+                  className={styles.tagInput}
+                />
                 <button type="button" onClick={() => handleRemoveTag(tag)} className={styles.deleteTagButton}>
                   Delete
                 </button>
@@ -145,13 +198,27 @@ export const CreatePost = () => {
             <input
               type="text"
               value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 12) {
+                  setTagInput(e.target.value);
+                  setErrors({
+                    ...errors,
+                    tag: '',
+                  });
+                } else {
+                  setErrors({
+                    ...errors,
+                    tag: 'Tag must be 12 characters or less.',
+                  });
+                }
+              }}
               placeholder="Tag"
-              className={styles.input}
+              className={`${styles.input_tag} ${errors.tag ? styles.inputError : ''}`}
             />
             <button type="button" onClick={handleAddTag} className={styles.addTagButton}>
               Add tag
             </button>
+            {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
           </div>
         </div>
         <button
