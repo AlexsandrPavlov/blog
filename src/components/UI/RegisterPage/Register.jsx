@@ -91,15 +91,20 @@ export const Register = () => {
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
+
     setIsLoading(true);
     try {
+      // Используем unwrap() для обработки результата или ошибки
       await dispatch(
         registerUser({username: formData.username, email: formData.email, password: formData.password})
-      ).unwarp(); // Используйте unwrap() для получения результата или ошибки потому что сплевывет промис
+      ).unwrap();
+
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/login');
       }, 3000);
+
+      // Сбрасываем форму
       setFormData({
         username: '',
         email: '',
@@ -108,17 +113,18 @@ export const Register = () => {
         agreeToTerms: false,
       });
     } catch (error) {
+      // Обработка ошибок от сервера
       if (error.username) {
-        setErrors({
-          ...errors,
-          username: `Username:'${formData.username}' ${error.username}`,
-        });
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          username: `Username '${formData.username}' ${error.username}`,
+        }));
       }
       if (error.email) {
-        setErrors({
-          ...errors,
-          email: `Email:'${formData.email}' ${error.email}`,
-        });
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          email: `Email '${formData.email}' ${error.email}`,
+        }));
       }
     } finally {
       setIsLoading(false); // Сбрасываем состояние загрузки
