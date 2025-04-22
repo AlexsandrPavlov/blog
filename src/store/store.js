@@ -6,7 +6,6 @@ import registerReducer from './slice/registerSlice.js';
 import authReducer from './slice/authSlice.js';
 import newPostReducer from './slice/newPostSlice.js';
 import deletePostReducer from './slice/deletePostSlice.js';
-import likePostReducer from './slice/likePostSlice.js';
 import editProfileReducer from './slice/editProfileSlice.js';
 
 export const store = configureStore({
@@ -18,7 +17,6 @@ export const store = configureStore({
     auth: authReducer,
     newPost: newPostReducer,
     deletePost: deletePostReducer,
-    likePost: likePostReducer,
     editProfile: editProfileReducer,
   },
 });

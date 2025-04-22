@@ -27,9 +27,24 @@ export const updateUser = (token, userData) =>
     }
   );
 
-export const getArticles = (params) => api.get('/articles', {params});
+export const getArticles = (params, token = null) =>
+  api.get('/articles', {
+    params,
+    headers: token
+      ? {
+          Authorization: `Token ${token}`,
+        }
+      : {},
+  });
 
-export const getArticle = (slug) => api.get(`/articles/${slug}`);
+export const getArticle = (slug, token = null) =>
+  api.get(`/articles/${slug}`, {
+    headers: token
+      ? {
+          Authorization: `Token ${token}`,
+        }
+      : {},
+  });
 
 export const createArticle = (token, articleData) =>
   api.post(

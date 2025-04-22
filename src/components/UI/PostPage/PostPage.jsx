@@ -7,6 +7,7 @@ import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 import {fetchPost} from '../../../store/slice/postSlice.js';
 import {PostHeader} from './PostContent/PostHeader/PostHeader.jsx';
+import {likePost, unlikePost} from '../../../store/slice/postSlice.js';
 
 export const PostPage = () => {
   const {slug} = useParams();
@@ -18,6 +19,14 @@ export const PostPage = () => {
       dispatch(fetchPost(slug));
     }
   }, [dispatch, slug, post]);
+
+  const clickLikePost = (slug) => {
+    if (post.favorited) {
+      dispatch(unlikePost({slug}));
+    } else {
+      dispatch(likePost({slug}));
+    }
+  };
 
   return (
     <div className={style.postPage}>
@@ -33,7 +42,7 @@ export const PostPage = () => {
         )) ||
         (post && (
           <>
-            <PostHeader {...post} />
+            <PostHeader {...post} clickLikePost={clickLikePost} />
             <div className={style.post_mardown}>
               <ReactMarkdown>{post.body}</ReactMarkdown>
             </div>

@@ -5,7 +5,7 @@ import avatar from './avatar.png';
 import {useNavigate} from 'react-router';
 import {formatDate} from '../../../Func/formatDate';
 import {useDispatch, useSelector} from 'react-redux';
-import {likePost, unlikePost} from '../../../../store/slice/likePostSlice.js';
+import {likePost, unlikePost} from '../../../../store/slice/articleSlice.js';
 
 export const Post = (props) => {
   const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited} = props;
