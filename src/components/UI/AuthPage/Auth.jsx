@@ -76,7 +76,7 @@ export const Auth = () => {
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/posts');
-      }, 1000);
+      }, 2000);
       setFormData({
         email: '',
         password: '',
@@ -120,7 +120,7 @@ export const Auth = () => {
           className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
           disabled={isLoading}
         >
-          {isLoading ? 'Logining...' : isSuccess ? 'Success! Redirect 3 s to posts ' : 'Login'}
+          {isLoading ? 'Logining...' : isSuccess ? 'Success! Redirect to main page ' : 'Login'}
         </button>
       </form>
       <p className={styles.footerText}>

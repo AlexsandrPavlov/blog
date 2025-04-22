@@ -102,7 +102,7 @@ export const Register = () => {
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/login');
-      }, 3000);
+      }, 2000);
 
       // Сбрасываем форму
       setFormData({
@@ -166,7 +166,7 @@ export const Register = () => {
           className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
           disabled={isLoading}
         >
-          {isLoading ? 'Creating...' : isSuccess ? 'Success! Redirect 3 s to login ' : 'Create'}
+          {isLoading ? 'Creating...' : isSuccess ? 'Success! Redirect to login ' : 'Create'}
         </button>
       </form>
       <p className={styles.footerText}>
