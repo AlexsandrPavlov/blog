@@ -21,8 +21,6 @@ export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async 
   }
   try {
     const response = await getCurrentUser(token);
-    const user = response.data.user;
-    localStorage.setItem('avatar', user.image);
     return response.data.user;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data.errors || 'Failed to fetch user');
@@ -34,7 +32,6 @@ const authSlice = createSlice({
   initialState: {
     user: JSON.parse(localStorage.getItem('user')) || null,
     token: localStorage.getItem('token') || null,
-    avatar: localStorage.getItem('avatar') || null,
     loading: false,
     error: null,
   },
@@ -44,8 +41,8 @@ const authSlice = createSlice({
       state.token = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      localStorage.removeItem('avatar');
       localStorage.removeItem('loginTime');
+      localStorage.removeItem('image');
     },
     checkSession(state) {
       const loginTime = localStorage.getItem('loginTime');
@@ -54,8 +51,8 @@ const authSlice = createSlice({
         state.token = null;
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        localStorage.removeItem('avatar');
         localStorage.removeItem('loginTime');
+        localStorage.removeItem('image');
       }
     },
   },

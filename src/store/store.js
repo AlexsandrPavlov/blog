@@ -7,6 +7,7 @@ import authReducer from './slice/authSlice.js';
 import newPostReducer from './slice/newPostSlice.js';
 import deletePostReducer from './slice/deletePostSlice.js';
 import likePostReducer from './slice/likePostSlice.js';
+import editProfileReducer from './slice/editProfileSlice.js';
 
 export const store = configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export const store = configureStore({
     newPost: newPostReducer,
     deletePost: deletePostReducer,
     likePost: likePostReducer,
+    editProfile: editProfileReducer,
   },
 });

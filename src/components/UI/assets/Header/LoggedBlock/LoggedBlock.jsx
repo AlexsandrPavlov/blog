@@ -25,7 +25,7 @@ export const LoggedBlock = () => {
       </Link>
       <div onClick={handaleProfile} className={styles.navbar__logged__user}>
         <p className={styles.username}>{user.username}</p>
-        {user.avatar ? <Avatar size={46} src={user.avatar} /> : <Avatar size={46} src={avatar} />}
+        {user.image ? <Avatar size={46} src={user.image} /> : <Avatar size={46} src={avatar} />}
       </div>
       <button onClick={handaleLogOut} className={styles.navbar__logout}>
         Log Out
