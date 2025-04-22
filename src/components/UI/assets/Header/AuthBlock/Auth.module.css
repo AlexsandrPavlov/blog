@@ -11,18 +11,18 @@
   color: black;
   padding: 10px 20px 10px 20px;
   font-weight: 400;
-  font-size: 18px;
   line-height: 28px;
-  letter-spacing: 0%;
+  letter-spacing: 0px;
   vertical-align: middle;
+  border-radius: 4px;
 }
 .link:hover {
   color: #007bff;
   border: 1px solid #007bff;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 .link__active {
   color: rgba(82, 196, 26, 1);
   border: 1px solid rgba(82, 196, 26, 1);
-  border-radius: 2px;
+  border-radius: 4px;
 }
