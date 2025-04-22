@@ -3,11 +3,24 @@ import style from './PostHeaderStyle.module.css';
 import {Avatar, Tag} from 'antd';
 import {HeartOutlined} from '@ant-design/icons';
 import avatar from '../../../../UI/PostsList/Post/avatar.png';
-import {useSelector} from 'react-redux';
+import {likePost, unlikePost} from '../../../../../store/slice/likePostSlice.js';
+import {useDispatch, useSelector} from 'react-redux';
 
 export const PostHeader = (post) => {
   const {token} = useSelector((state) => state.auth);
-  const {title, description, author, createdAt, tagList, favoritesCount, favorited} = post;
+  const dispatch = useDispatch();
+  const {title, description, author, createdAt, tagList, favoritesCount, favorited, slug} = post;
+  const handleLikeClick = () => {
+    if (!token) {
+      alert('You must be logged in to like posts.');
+      return;
+    }
+    if (favorited) {
+      dispatch(unlikePost({slug}));
+    } else {
+      dispatch(likePost({slug}));
+    }
+  };
   return (
     <div className={style.container_header}>
       <div className={style.post_header}>

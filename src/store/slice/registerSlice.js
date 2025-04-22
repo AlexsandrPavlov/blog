@@ -4,7 +4,8 @@ import {register} from '../../components/api/api.js';
 export const registerUser = createAsyncThunk('auth/register', async ({username, email, password}, thunkAPI) => {
   try {
     const response = await register(username, email, password);
-    return response.data.user;
+    const user = response.data.user;
+    return user;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data.errors);
   }

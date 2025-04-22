@@ -13,6 +13,11 @@ export const login = (email, password) => api.post('/users/login', {user: {email
 
 export const register = (username, email, password) => api.post('/users', {user: {username, email, password}});
 
+export const getCurrentUser = (token) =>
+  api.get('/user', {
+    headers: {Authorization: `Token ${token}`},
+  });
+
 export const updateUser = (token, userData) =>
   api.put(
     '/user',

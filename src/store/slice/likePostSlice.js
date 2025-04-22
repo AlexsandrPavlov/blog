@@ -8,6 +8,7 @@ export const likePost = createAsyncThunk('post/like', async ({slug}, thunkAPI) =
   }
   try {
     const response = await likeArticle(token, slug);
+    console.log(response.data.article);
     return response.data.article;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data.errors);
