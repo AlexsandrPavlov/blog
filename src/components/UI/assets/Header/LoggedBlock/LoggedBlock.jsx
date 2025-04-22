@@ -20,7 +20,7 @@ export const LoggedBlock = () => {
   };
   return (
     <div className={styles.navbar__logged}>
-      <Link className={styles.link} to="/">
+      <Link className={styles.link} to="/post/create">
         Create article
       </Link>
       <div onClick={handaleProfile} className={styles.navbar__logged__user}>

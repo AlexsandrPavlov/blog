@@ -7,7 +7,7 @@ import avatar from '../../../../UI/PostsList/Post/avatar.png';
 import {useSelector} from 'react-redux';
 
 export const PostHeader = (post) => {
-  const {token} = useSelector((state) => state.auth);
+  const {token, username} = useSelector((state) => state.auth);
 
   const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited, clickLikePost} = post;
 
@@ -50,6 +50,12 @@ export const PostHeader = (post) => {
           </section>
           {author.image ? <Avatar size={46} src={author.image} /> : <Avatar size={46} src={avatar} />}
         </section>
+        {username === author && (
+          <div className={style.post_header_user_actions}>
+            <button className={style.post_header_user_button}>Edit</button>
+            <button className={style.post_header_user_button}>Delete</button>
+          </div>
+        )}
       </div>
       <div className={style.post_content}>
         <p>{description}</p>

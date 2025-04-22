@@ -6,6 +6,8 @@ import {PostPage} from './components/UI/PostPage/PostPage.jsx';
 import {Register} from './components/UI/RegisterPage/Register.jsx';
 import {Auth} from './components/UI/AuthPage/Auth.jsx';
 import {EditProfile} from './components/UI/EditProfile/EditProfile.jsx';
+import {PrivateRoute} from './components/PrivateRoute.jsx';
+import {CreatePost} from './components/UI/CreatePost/CreatePost.jsx';
 
 export const AppRoutes = () => {
   return (
@@ -18,7 +20,22 @@ export const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Auth />} />
-        <Route path="login/edit" element={<EditProfile />} />
+        <Route
+          path="login/edit"
+          element={
+            <PrivateRoute>
+              <EditProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="post/create"
+          element={
+            <PrivateRoute>
+              <CreatePost />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );
