@@ -31,14 +31,14 @@ const editPostSlice = createSlice({
     post: null,
     isLoading: false,
     error: null,
-    isSuccess: false,
+    update: false,
   },
   reducers: {
     clearEditPostState: (state) => {
       state.post = null;
       state.isLoading = false;
       state.error = null;
-      state.isSuccess = false;
+      state.update = false;
     },
   },
   extraReducers: (builder) => {
@@ -60,17 +60,17 @@ const editPostSlice = createSlice({
       .addCase(updatePost.pending, (state) => {
         state.isLoading = true;
         state.error = null;
-        state.isSuccess = false;
+        state.update = false;
       })
       .addCase(updatePost.fulfilled, (state, action) => {
         state.isLoading = false;
         state.post = action.payload;
-        state.isSuccess = true;
+        state.update = true;
       })
       .addCase(updatePost.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        state.isSuccess = false;
+        state.update = false;
       });
   },
 });

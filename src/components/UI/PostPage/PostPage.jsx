@@ -13,6 +13,7 @@ export const PostPage = () => {
   const {slug} = useParams();
   const dispatch = useDispatch();
   const {post, loading, error} = useSelector((state) => state.article);
+  const {update} = useSelector((state) => state.editPost);
 
   useEffect(() => {
     if (!post || post.slug !== slug) {
@@ -27,6 +28,11 @@ export const PostPage = () => {
       dispatch(likePost({slug}));
     }
   };
+  useEffect(() => {
+    if (update) {
+      dispatch(fetchPost(slug));
+    }
+  }, [update, dispatch, slug]);
 
   return (
     <div className={style.postPage}>
