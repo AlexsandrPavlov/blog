@@ -23,9 +23,14 @@
   max-width: 880px;
   max-height: 685px;
   margin-top: 20px;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
   overflow: auto;
   padding: 50px 20px 20px 20px;
+}
+.post_mardown ul,
+.post_mardown ol {
+  margin-left: 24px;
+}
+
+.post_mardown li {
+  margin-bottom: 6px; /* расстояние между пунктами списка */
 }
