@@ -1,6 +1,6 @@
 .postPage {
   width: 941px;
-  height: 870px;
+  height: auto;
   display: flex;
   margin: 0 auto;
   background-color: white;

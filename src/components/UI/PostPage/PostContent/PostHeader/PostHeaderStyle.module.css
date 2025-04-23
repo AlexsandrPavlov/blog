@@ -96,14 +96,14 @@
   display: flex;
   justify-content: space-between;
 }
-.description {
+.description_text {
   overflow: hidden;
   text-overflow: clip;
   white-space: initial;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   font-weight: 400;
   font-size: 16px;
   line-height: 22px;
