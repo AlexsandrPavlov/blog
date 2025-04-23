@@ -15,7 +15,7 @@ export const CreatePost = () => {
     title: '',
     description: '',
     body: '',
-    tagList: [''],
+    tagList: [],
   });
 
   const [errors, setErrors] = useState({
@@ -38,7 +38,7 @@ export const CreatePost = () => {
     if (name === 'title' && value.length > 50) {
       setErrors({
         ...errors,
-        title: ' must be 50 characters or less.',
+        title: 'Title must be 50 characters or less.',
       });
       return;
     }
@@ -56,22 +56,20 @@ export const CreatePost = () => {
   const handleAddTagField = () => {
     setFormData({
       ...formData,
-      tagList: [...formData.tagList, ''], // Добавляем пустое поле для нового тега
+      tagList: [...formData.tagList, ''],
     });
   };
 
   const handleRemoveTag = (index) => {
-    if (formData.tagList.length > 1) {
-      const updatedTags = formData.tagList.filter((_, i) => i !== index);
-      setFormData({
-        ...formData,
-        tagList: updatedTags,
-      });
-      setErrors({
-        ...errors,
-        tag: '',
-      });
-    }
+    const updatedTags = formData.tagList.filter((_, i) => i !== index);
+    setFormData({
+      ...formData,
+      tagList: updatedTags,
+    });
+    setErrors({
+      ...errors,
+      tag: '',
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -173,12 +171,7 @@ export const CreatePost = () => {
                 placeholder="Tag"
                 className={`${styles.tagInput} ${errors.tag && !tag.trim() ? styles.inputError : ''}`}
               />
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(index)}
-                className={styles.deleteTagButton}
-                disabled={formData.tagList.length === 1}
-              >
+              <button type="button" onClick={() => handleRemoveTag(index)} className={styles.deleteTagButton}>
                 Delete
               </button>
               {index === formData.tagList.length - 1 && (
@@ -189,6 +182,11 @@ export const CreatePost = () => {
             </div>
           ))}
           {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
+          {!formData.tagList.length && (
+            <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
+              Add tag
+            </button>
+          )}
         </div>
         <button
           type="submit"
