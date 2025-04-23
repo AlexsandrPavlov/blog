@@ -16,7 +16,7 @@ export const EditPost = () => {
     title: '',
     description: '',
     body: '',
-    tagList: [''],
+    tagList: [],
   });
 
   const [errors, setErrors] = useState({
@@ -81,17 +81,15 @@ export const EditPost = () => {
   };
 
   const handleRemoveTag = (index) => {
-    if (formData.tagList.length > 1) {
-      const updatedTags = formData.tagList.filter((_, i) => i !== index);
-      setFormData({
-        ...formData,
-        tagList: updatedTags,
-      });
-      setErrors({
-        ...errors,
-        tag: '',
-      });
-    }
+    const updatedTags = formData.tagList.filter((_, i) => i !== index);
+    setFormData({
+      ...formData,
+      tagList: updatedTags,
+    });
+    setErrors({
+      ...errors,
+      tag: '',
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -193,12 +191,7 @@ export const EditPost = () => {
                 placeholder="Tag"
                 className={`${styles.tagInput} ${errors.tag && !tag.trim() ? styles.inputError : ''}`}
               />
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(index)}
-                className={styles.deleteTagButton}
-                disabled={formData.tagList.length === 1}
-              >
+              <button type="button" onClick={() => handleRemoveTag(index)} className={styles.deleteTagButton}>
                 Delete
               </button>
               {index === formData.tagList.length - 1 && (
@@ -209,6 +202,11 @@ export const EditPost = () => {
             </div>
           ))}
           {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
+          {!formData.tagList.length && (
+            <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
+              Add tag
+            </button>
+          )}
         </div>
         <button
           type="submit"
