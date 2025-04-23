@@ -83,7 +83,7 @@ export const PostHeader = (post) => {
 
       <div className={style.post_content}>
         <p className={style.description}>{description}</p>
-        {user.username === author.username && (
+        {token && user.username === author.username && (
           <div className={style.post_header_user_actions}>
             <button onClick={handleDel} className={`${style.post_header_user_delete} ${style.post_header_user_button}`}>
               Delete
