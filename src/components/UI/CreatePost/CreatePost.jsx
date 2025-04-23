@@ -10,12 +10,13 @@ export const CreatePost = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {token} = useSelector((state) => state.auth);
+  const {post} = useSelector((state) => state.newPost);
 
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     body: '',
-    tagList: [],
+    tagList: [''],
   });
 
   const [errors, setErrors] = useState({
@@ -25,17 +26,13 @@ export const CreatePost = () => {
     tag: '',
   });
 
-  const [tagInput, setTagInput] = useState('');
-  const [editingTagIndex, setEditingTagIndex] = useState(null); // Индекс редактируемого тега
-  const [originalTagValue, setOriginalTagValue] = useState(''); // Оригинальное значение тега
-
   const handleChange = (e) => {
     const {name, value} = e.target;
 
-    if (name === 'description' && value.length > 120) {
+    if (name === 'description' && value.length > 240) {
       setErrors({
         ...errors,
-        description: 'Description must be 120 characters or less.',
+        description: 'Description must be 240 characters or less.',
       });
       return;
     }
@@ -57,21 +54,25 @@ export const CreatePost = () => {
     });
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && !formData.tagList.includes(tagInput.trim())) {
-      setFormData({
-        ...formData,
-        tagList: [...formData.tagList, tagInput.trim()],
-      });
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tag) => {
+  const handleAddTagField = () => {
     setFormData({
       ...formData,
-      tagList: formData.tagList.filter((t) => t !== tag),
+      tagList: [...formData.tagList, ''], // Добавляем пустое поле для нового тега
     });
+  };
+
+  const handleRemoveTag = (index) => {
+    if (formData.tagList.length > 1) {
+      const updatedTags = formData.tagList.filter((_, i) => i !== index);
+      setFormData({
+        ...formData,
+        tagList: updatedTags,
+      });
+      setErrors({
+        ...errors,
+        tag: '',
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -85,10 +86,11 @@ export const CreatePost = () => {
           : '',
       description: !formData.description.trim()
         ? 'Description is required.'
-        : formData.description.length > 120
-          ? 'Description must be 120 characters or less.'
+        : formData.description.length > 240
+          ? 'Description must be 240 characters or less.'
           : '',
       body: !formData.body.trim() ? 'Text is required.' : '',
+      tag: formData.tagList.some((tag) => !tag.trim()) ? 'Tags cannot be empty.' : '',
     };
 
     setErrors(newErrors);
@@ -102,7 +104,7 @@ export const CreatePost = () => {
       await dispatch(createPost({token, articleData: formData})).unwrap();
       setIsSuccess(true);
       setTimeout(() => {
-        navigate('/posts');
+        navigate(`/post/${post.slug}`);
       }, 1000);
     } catch (error) {
       console.error('Failed to create post:', error);
@@ -156,70 +158,38 @@ export const CreatePost = () => {
           {errors.body && <p className={styles.errorText}>{errors.body}</p>}
         </label>
         <div className={styles.tagsContainer}>
-          <div className={styles.tagsList}>
-            {formData.tagList.map((tag, index) => (
-              <div key={index} className={styles.tag}>
-                <input
-                  type="text"
-                  value={editingTagIndex === index ? tag : formData.tagList[index]}
-                  onChange={(e) => {
-                    const updatedTags = [...formData.tagList];
-                    updatedTags[index] = e.target.value.slice(0, 12); // Ограничение длины до 12 символов
-                    setFormData({
-                      ...formData,
-                      tagList: updatedTags,
-                    });
-                  }}
-                  onFocus={() => {
-                    setEditingTagIndex(index); // Устанавливаем текущий редактируемый индекс
-                    setOriginalTagValue(tag); // Сохраняем оригинальное значение
-                  }}
-                  onBlur={() => {
-                    if (formData.tagList[index].trim() === '') {
-                      // Если поле пустое, возвращаем оригинальное значение
-                      const updatedTags = [...formData.tagList];
-                      updatedTags[index] = originalTagValue;
-                      setFormData({
-                        ...formData,
-                        tagList: updatedTags,
-                      });
-                    }
-                    setEditingTagIndex(null); // Сбрасываем редактируемый индекс
-                  }}
-                  className={styles.tagInput}
-                />
-                <button type="button" onClick={() => handleRemoveTag(tag)} className={styles.deleteTagButton}>
-                  Delete
+          {formData.tagList.map((tag, index) => (
+            <div key={index} className={styles.tag}>
+              <input
+                type="text"
+                value={tag}
+                onChange={(e) => {
+                  const updatedTags = [...formData.tagList];
+                  updatedTags[index] = e.target.value.slice(0, 12).trim(); // Ограничиваем длину тега до 12 символов
+                  setFormData({
+                    ...formData,
+                    tagList: updatedTags,
+                  });
+                }}
+                placeholder="Tag"
+                className={`${styles.tagInput} ${errors.tag && !tag.trim() ? styles.inputError : ''}`}
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveTag(index)}
+                className={styles.deleteTagButton}
+                disabled={formData.tagList.length === 1}
+              >
+                Delete
+              </button>
+              {index === formData.tagList.length - 1 && (
+                <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
+                  Add tag
                 </button>
-              </div>
-            ))}
-          </div>
-          <div className={styles.addTagContainer}>
-            <input
-              type="text"
-              value={tagInput}
-              onChange={(e) => {
-                if (e.target.value.length <= 12) {
-                  setTagInput(e.target.value);
-                  setErrors({
-                    ...errors,
-                    tag: '',
-                  });
-                } else {
-                  setErrors({
-                    ...errors,
-                    tag: 'Tag must be 12 characters or less.',
-                  });
-                }
-              }}
-              placeholder="Tag"
-              className={`${styles.input_tag} ${errors.tag ? styles.inputError : ''}`}
-            />
-            <button type="button" onClick={handleAddTag} className={styles.addTagButton}>
-              Add tag
-            </button>
-            {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
-          </div>
+              )}
+            </div>
+          ))}
+          {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
         </div>
         <button
           type="submit"

@@ -3,16 +3,42 @@ import style from './PostHeaderStyle.module.css';
 import {Avatar, Tag} from 'antd';
 import {HeartOutlined, HeartFilled} from '@ant-design/icons';
 import avatar from '../../../../UI/PostsList/Post/avatar.png';
+import {Modal} from 'antd';
+import {ExclamationCircleFilled} from '@ant-design/icons';
+import {useDispatch} from 'react-redux';
+import {deletePost} from '../../../../../store/slice/deletePostSlice';
+import {useNavigate} from 'react-router-dom';
 
 import {useSelector} from 'react-redux';
 
+const {confirm} = Modal;
+
 export const PostHeader = (post) => {
   const {token, user} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited, clickLikePost} = post;
 
   const handleLikeClick = () => {
     clickLikePost(slug);
+  };
+
+  const handleDel = () => {
+    confirm({
+      title: 'Are you sure you want to delete this post?',
+      icon: <ExclamationCircleFilled />,
+      content: 'This action cannot be undone.',
+      onOk: async () => {
+        try {
+          await dispatch(deletePost({slug, token})).unwrap();
+          navigate('/posts');
+        } catch (error) {
+          console.error('Failed to delete post:', error);
+        }
+      },
+      onCancel() {},
+    });
   };
 
   return (
@@ -54,13 +80,15 @@ export const PostHeader = (post) => {
 
       <div className={style.post_content}>
         <p className={style.description}>{description}</p>
+        {user.username === author.username && (
+          <div className={style.post_header_user_actions}>
+            <button onClick={handleDel} className={`${style.post_header_user_delete} ${style.post_header_user_button}`}>
+              Delete
+            </button>
+            <button className={`${style.post_header_user_edit} ${style.post_header_user_button}`}>Edit</button>
+          </div>
+        )}
       </div>
-      {user.username === author.username && (
-        <div className={style.post_header_user_actions}>
-          <button className={`${style.post_header_user_delete} ${style.post_header_user_button}`}>Delete</button>
-          <button className={`${style.post_header_user_edit} ${style.post_header_user_button}`}>Edit</button>
-        </div>
-      )}
     </div>
   );
 };
