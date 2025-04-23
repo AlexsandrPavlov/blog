@@ -40,6 +40,9 @@ export const PostHeader = (post) => {
       onCancel() {},
     });
   };
+  const handleEdit = () => {
+    navigate('/../post/edit/' + slug);
+  };
 
   return (
     <div className={style.container_header}>
@@ -85,7 +88,9 @@ export const PostHeader = (post) => {
             <button onClick={handleDel} className={`${style.post_header_user_delete} ${style.post_header_user_button}`}>
               Delete
             </button>
-            <button className={`${style.post_header_user_edit} ${style.post_header_user_button}`}>Edit</button>
+            <button onClick={handleEdit} className={`${style.post_header_user_edit} ${style.post_header_user_button}`}>
+              Edit
+            </button>
           </div>
         )}
       </div>

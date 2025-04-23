@@ -8,6 +8,7 @@ import {Auth} from './components/UI/AuthPage/Auth.jsx';
 import {EditProfile} from './components/UI/EditProfile/EditProfile.jsx';
 import {PrivateRoute} from './components/PrivateRoute.jsx';
 import {CreatePost} from './components/UI/CreatePost/CreatePost.jsx';
+import {EditPost} from './components/UI/EditPost/EditPost.jsx';
 
 export const AppRoutes = () => {
   return (
@@ -33,6 +34,14 @@ export const AppRoutes = () => {
           element={
             <PrivateRoute>
               <CreatePost />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="post/edit/:slug"
+          element={
+            <PrivateRoute>
+              <EditPost />
             </PrivateRoute>
           }
         />

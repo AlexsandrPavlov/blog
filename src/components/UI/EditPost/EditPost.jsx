@@ -1,14 +1,15 @@
-import styles from './CreatePostStyle.module.css';
-import {useState} from 'react';
+import styles from './EditPostStyle.module.css';
+import {useState, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
-import {createPost} from '../../../store/slice/newPostSlice.js';
+import {useNavigate, useParams} from 'react-router-dom';
+import {fetchPost, updatePost} from '../../../store/slice/editPostSlice.js';
 
-export const CreatePost = () => {
+export const EditPost = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const {slug} = useParams();
   const {token} = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
@@ -25,6 +26,25 @@ export const CreatePost = () => {
     tag: '',
   });
 
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        const fetchedPost = await dispatch(fetchPost(slug)).unwrap();
+        setFormData({
+          title: fetchedPost.title,
+          description: fetchedPost.description,
+          body: fetchedPost.body,
+          tagList: fetchedPost.tagList.length ? fetchedPost.tagList : [''],
+        });
+      } catch (error) {
+        console.error('Failed to load post:', error);
+        navigate('/404');
+      }
+    };
+
+    loadPost();
+  }, [dispatch, slug, navigate, token]);
+
   const handleChange = (e) => {
     const {name, value} = e.target;
 
@@ -38,7 +58,7 @@ export const CreatePost = () => {
     if (name === 'title' && value.length > 50) {
       setErrors({
         ...errors,
-        title: ' must be 50 characters or less.',
+        title: 'Title must be 50 characters or less.',
       });
       return;
     }
@@ -56,7 +76,7 @@ export const CreatePost = () => {
   const handleAddTagField = () => {
     setFormData({
       ...formData,
-      tagList: [...formData.tagList, ''], // Добавляем пустое поле для нового тега
+      tagList: [...formData.tagList, ''],
     });
   };
 
@@ -100,16 +120,16 @@ export const CreatePost = () => {
 
     setIsLoading(true);
     try {
-      const createdPost = await dispatch(createPost({token, articleData: formData})).unwrap();
+      const editedPost = await dispatch(updatePost({token, slug, articleData: formData})).unwrap();
       setIsSuccess(true);
       setTimeout(() => {
-        navigate(`/post/${createdPost.slug}`);
+        navigate(`/post/${editedPost.slug}`);
       }, 1000);
     } catch (error) {
-      console.error('Failed to create post:', error);
+      console.error('Failed to update post:', error);
       setErrors({
         ...errors,
-        title: 'Failed to create post.',
+        title: 'Failed to update post.',
       });
       setIsSuccess(false);
     } finally {
@@ -119,7 +139,7 @@ export const CreatePost = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Create new article</h1>
+      <h1 className={styles.title}>Edit article</h1>
       <form className={styles.form} onSubmit={handleSubmit}>
         <label className={styles.label}>
           Title
@@ -164,7 +184,7 @@ export const CreatePost = () => {
                 value={tag}
                 onChange={(e) => {
                   const updatedTags = [...formData.tagList];
-                  updatedTags[index] = e.target.value.slice(0, 12).trim(); // Ограничиваем длину тега до 12 символов
+                  updatedTags[index] = e.target.value.slice(0, 12).trim();
                   setFormData({
                     ...formData,
                     tagList: updatedTags,
@@ -195,7 +215,7 @@ export const CreatePost = () => {
           className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
           disabled={isLoading}
         >
-          {isLoading ? 'Saving...' : isSuccess ? 'Success! Redirecting to post' : 'Send'}
+          {isLoading ? 'Saving...' : isSuccess ? 'Success! Redirecting to post' : 'Save'}
         </button>
       </form>
     </div>
