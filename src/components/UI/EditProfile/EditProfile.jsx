@@ -31,6 +31,7 @@ export const EditProfile = () => {
       name: 'username',
       type: 'text',
       placeholder: 'Username',
+      autoFocus: false,
       label: 'New Username',
       validation: (value) =>
         !value.trim() || value.length < 3 || value.length > 20 ? 'Username must be between 3 and 20 characters.' : '',
@@ -40,6 +41,7 @@ export const EditProfile = () => {
       type: 'email',
       placeholder: 'Email address',
       label: 'New Email address',
+      autoFocus: false,
       validation: (value) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return !emailRegex.test(value) ? 'Invalid email address.' : '';
@@ -48,6 +50,7 @@ export const EditProfile = () => {
     {
       name: 'password',
       type: 'password',
+      autoFocus: true,
       placeholder: 'Password',
       label: 'New Password',
       validation: (value) =>
@@ -58,6 +61,7 @@ export const EditProfile = () => {
       type: 'text',
       placeholder: 'Avatar image (url)',
       label: 'Avatar image (url)',
+      autoFocus: false,
       validation: (value) => {
         const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-]*)*\/?(\?.*)?(\.(jpg|jpeg|png|gif|webp|svg))$/i;
         return !urlRegex.test(value)
@@ -127,6 +131,7 @@ export const EditProfile = () => {
               name={field.name}
               value={formData[field.name]}
               onChange={handleChange}
+              autoFocus={field.autoFocus}
               placeholder={field.placeholder}
               className={`${styles.input} ${errors[field.name] ? styles.inputError : ''}`}
             />

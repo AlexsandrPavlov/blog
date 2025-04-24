@@ -142,6 +142,7 @@ export const EditPost = () => {
         <label className={styles.label}>
           Title
           <input
+            autoFocus
             type="text"
             name="title"
             value={formData.title}

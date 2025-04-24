@@ -26,6 +26,7 @@ export const Auth = () => {
       type: 'email',
       placeholder: 'Email address',
       label: 'Email address',
+      autoFocus: true,
       validation: (value) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return !emailRegex.test(value) ? 'Invalid email address.' : '';
@@ -36,6 +37,7 @@ export const Auth = () => {
       type: 'password',
       placeholder: 'Password',
       label: 'Password',
+      autoFocus: false,
       validation: (value) =>
         value.length < 6 || value.length > 40 ? 'Password must be between 6 and 40 characters.' : '',
     },
@@ -76,7 +78,7 @@ export const Auth = () => {
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/posts');
-      }, 2000);
+      }, 1000);
       setFormData({
         email: '',
         password: '',
@@ -105,6 +107,7 @@ export const Auth = () => {
           <label key={field.name} className={styles.label}>
             {field.label}
             <input
+              autoFocus={field.autoFocus}
               type={field.type}
               name={field.name}
               value={formData[field.name]}

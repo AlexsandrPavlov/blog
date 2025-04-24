@@ -33,6 +33,7 @@ export const Register = () => {
       type: 'text',
       placeholder: 'Username',
       label: 'Username',
+      autoFocus: true,
       validation: (value) =>
         !value.trim() || value.length < 3 || value.length > 20 ? 'Username must be between 3 and 20 characters.' : '',
     },
@@ -41,6 +42,7 @@ export const Register = () => {
       type: 'email',
       placeholder: 'Email address',
       label: 'Email address',
+      autoFocus: false,
       validation: (value) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return !emailRegex.test(value) ? 'Invalid email address.' : '';
@@ -51,6 +53,7 @@ export const Register = () => {
       type: 'password',
       placeholder: 'Password',
       label: 'Password',
+      autoFocus: false,
       validation: (value) =>
         value.length < 6 || value.length > 40 ? 'Password must be between 6 and 40 characters.' : '',
     },
@@ -59,6 +62,7 @@ export const Register = () => {
       type: 'password',
       placeholder: 'Repeat Password',
       label: 'Repeat Password',
+      autoFocus: false,
       validation: (value) => (value !== formData.password ? 'Passwords do not match.' : ''),
     },
   ];
@@ -94,7 +98,6 @@ export const Register = () => {
 
     setIsLoading(true);
     try {
-      // Используем unwrap() для обработки результата или ошибки
       await dispatch(
         registerUser({username: formData.username, email: formData.email, password: formData.password})
       ).unwrap();
@@ -102,9 +105,8 @@ export const Register = () => {
       setIsSuccess(true);
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 1000);
 
-      // Сбрасываем форму
       setFormData({
         username: '',
         email: '',
@@ -113,7 +115,6 @@ export const Register = () => {
         agreeToTerms: false,
       });
     } catch (error) {
-      // Обработка ошибок от сервера
       if (error.username) {
         setErrors((prevErrors) => ({
           ...prevErrors,
@@ -127,7 +128,7 @@ export const Register = () => {
         }));
       }
     } finally {
-      setIsLoading(false); // Сбрасываем состояние загрузки
+      setIsLoading(false);
     }
   };
 
@@ -139,6 +140,7 @@ export const Register = () => {
           <label key={field.name} className={styles.label}>
             {field.label}
             <input
+              autoFocus={field.autoFocus}
               type={field.type}
               name={field.name}
               value={formData[field.name]}
