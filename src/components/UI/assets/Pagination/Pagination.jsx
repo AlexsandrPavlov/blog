@@ -1,9 +1,10 @@
 import {Pagination} from 'antd';
 import style from './Pagination.module.css';
+import {useMemo} from 'react';
 
-export const PaginationPosts = ({countPosts, handlePageChange, currentPage}) => {
-  return (
-    <>
+export const MemoizedPaginationPosts = ({countPosts, handlePageChange, currentPage}) => {
+  const pagination = useMemo(
+    () => (
       <Pagination
         align="center"
         defaultCurrent={currentPage}
@@ -15,6 +16,9 @@ export const PaginationPosts = ({countPosts, handlePageChange, currentPage}) => 
         className={style.pagination}
         showSizeChanger={false}
       />
-    </>
+    ),
+    [countPosts, handlePageChange, currentPage]
   );
+
+  return <>{pagination}</>;
 };

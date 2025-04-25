@@ -1,4 +1,4 @@
-import {PaginationPosts} from '../assets/Pagination/Pagination';
+import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
 import {Post} from './Post/Post.jsx';
 import style from './PostList.module.css';
 import {useEffect} from 'react';
@@ -32,7 +32,7 @@ export const PostList = () => {
         {articles.map((article) => (
           <Post key={article.slug} {...article} />
         ))}
-        <PaginationPosts countPosts={count} handlePageChange={handlePageChange} currentPage={currentPage} />
+        <MemoizedPaginationPosts countPosts={count} handlePageChange={handlePageChange} currentPage={currentPage} />
       </div>
     )
   );
