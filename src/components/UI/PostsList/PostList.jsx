@@ -1,33 +1,28 @@
-import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
 import {Post} from './Post/Post.jsx';
 import style from './PostList.module.css';
-import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchArticles} from '../../../store/slice/articleSlice.js';
 import {setPage} from '../../../store/slice/paginationSlice.js';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
+import {useGetArticlesQuery} from '../../../api/userApi.js';
+import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
 
 export const PostList = () => {
   const dispatch = useDispatch();
-  const {items: articles, count, loading, error} = useSelector((state) => state.articles);
+  const {data: count, articles, isLoading, isError} = useGetArticlesQuery({limit, offset});
   const {currentPage, limit, offset} = useSelector((state) => state.pagination);
-
-  useEffect(() => {
-    dispatch(fetchArticles({limit, offset}));
-  }, [dispatch, limit, offset]);
 
   const handlePageChange = (offset, page) => {
     dispatch(setPage({page}));
   };
 
   return (
-    (loading && (
+    (isLoading && (
       <div className={style.spinner_wrapper}>
         <Spinner />
       </div>
     )) ||
-    (error && <ErrorAlert error={error} />) || (
+    (isError && <ErrorAlert error={isError} />) || (
       <div className={style.posts_wrapper}>
         {articles.map((article) => (
           <Post key={article.slug} {...article} />

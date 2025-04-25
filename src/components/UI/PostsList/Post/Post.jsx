@@ -4,15 +4,14 @@ import {HeartOutlined, HeartFilled} from '@ant-design/icons';
 import avatar from './avatar.png';
 import {useNavigate} from 'react-router';
 import {formatDate} from '../../../Func/formatDate';
-import {useDispatch, useSelector} from 'react-redux';
-import {likePost, unlikePost} from '../../../../store/slice/articleSlice.js';
+import {useLikeArticleMutation, useUnlikeArticleMutation} from '../../../../api/userApi.js';
 
 export const Post = (props) => {
-  const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited} = props;
+  const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited, token} = props;
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const {token} = useSelector((state) => state.auth);
+  const like = useLikeArticleMutation();
+  const unLike = useUnlikeArticleMutation();
 
   const handlePostClick = () => {
     navigate('/post/' + slug);
@@ -20,9 +19,9 @@ export const Post = (props) => {
 
   const handleLikeClick = () => {
     if (favorited) {
-      dispatch(unlikePost({slug}));
+      unLike({slug});
     } else {
-      dispatch(likePost({slug}));
+      like({slug});
     }
   };
 
