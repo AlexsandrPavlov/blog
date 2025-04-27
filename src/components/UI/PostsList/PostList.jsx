@@ -1,19 +1,19 @@
 import {Post} from './Post/Post.jsx';
 import style from './PostList.module.css';
-import {useDispatch, useSelector} from 'react-redux';
-import {setPage} from '../../../store/slice/paginationSlice.js';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
-import {useGetArticlesQuery} from '../../../api/userApi.js';
+import {useGetArticlesQuery} from '../../../api/postApi.js';
 import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
+import {useState} from 'react';
+import {useSelector} from 'react-redux';
 
 export const PostList = () => {
-  const dispatch = useDispatch();
-  const {data: count, articles, isLoading, isError} = useGetArticlesQuery({limit, offset});
-  const {currentPage, limit, offset} = useSelector((state) => state.pagination);
+  const token = useSelector((state) => (state.auth.user ? state.auth.user.token : null));
+  const [offset, setOffset] = useState(0);
+  const {data, error, isLoading, isError} = useGetArticlesQuery({limit: 5, offset: offset, token});
 
-  const handlePageChange = (offset, page) => {
-    dispatch(setPage({page}));
+  const handlePageChange = (newOffset) => {
+    setOffset(newOffset);
   };
 
   return (
@@ -22,12 +22,12 @@ export const PostList = () => {
         <Spinner />
       </div>
     )) ||
-    (isError && <ErrorAlert error={isError} />) || (
+    (isError && <ErrorAlert error={error} />) || (
       <div className={style.posts_wrapper}>
-        {articles.map((article) => (
-          <Post key={article.slug} {...article} />
+        {data.articles.map((article) => (
+          <Post key={article.slug} {...article} token={token} />
         ))}
-        <MemoizedPaginationPosts countPosts={count} handlePageChange={handlePageChange} currentPage={currentPage} />
+        <MemoizedPaginationPosts countPosts={data.articlesCount} handlePageChange={handlePageChange} currentPage={1} />
       </div>
     )
   );

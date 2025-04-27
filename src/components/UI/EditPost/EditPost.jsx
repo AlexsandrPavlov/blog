@@ -1,24 +1,24 @@
 import styles from './EditPostStyle.module.css';
-import {useState, useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {useNavigate, useParams} from 'react-router-dom';
-import {fetchPost, updatePost} from '../../../store/slice/editPostSlice.js';
+import {useGetArticleQuery, useUpdateArticleMutation} from '../../../api/postApi.js';
+import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
+import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 
 export const EditPost = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const {slug} = useParams();
-  const {token} = useSelector((state) => state.auth);
+  const token = useSelector((state) => state.auth.user.token);
+  const [updateArticle, {isSuccess, isPending}] = useUpdateArticleMutation();
+  const {data, error, isLoading} = useGetArticleQuery({slug, token});
 
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    body: '',
-    tagList: [],
+    title: data.article.title,
+    description: data.article.description,
+    body: data.article.body,
+    tagList: data.article.tagList,
   });
-
   const [errors, setErrors] = useState({
     title: '',
     description: '',
@@ -26,28 +26,8 @@ export const EditPost = () => {
     tag: '',
   });
 
-  useEffect(() => {
-    const loadPost = async () => {
-      try {
-        const fetchedPost = await dispatch(fetchPost(slug)).unwrap();
-        setFormData({
-          title: fetchedPost.title,
-          description: fetchedPost.description,
-          body: fetchedPost.body,
-          tagList: fetchedPost.tagList.length ? fetchedPost.tagList : [''],
-        });
-      } catch (error) {
-        console.error('Failed to load post:', error);
-        navigate('/404');
-      }
-    };
-
-    loadPost();
-  }, [dispatch, slug, navigate, token]);
-
   const handleChange = (e) => {
     const {name, value} = e.target;
-
     if (name === 'description' && value.length > 240) {
       setErrors({
         ...errors,
@@ -66,20 +46,17 @@ export const EditPost = () => {
       ...formData,
       [name]: value,
     });
-
     setErrors({
       ...errors,
       [name]: '',
     });
   };
-
   const handleAddTagField = () => {
     setFormData({
       ...formData,
       tagList: [...formData.tagList, ''],
     });
   };
-
   const handleRemoveTag = (index) => {
     const updatedTags = formData.tagList.filter((_, i) => i !== index);
     setFormData({
@@ -91,10 +68,8 @@ export const EditPost = () => {
       tag: '',
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = {
       title: !formData.title.trim()
         ? 'Title is required.'
@@ -109,19 +84,15 @@ export const EditPost = () => {
       body: !formData.body.trim() ? 'Text is required.' : '',
       tag: formData.tagList.some((tag) => !tag.trim()) ? 'Tags cannot be empty.' : '',
     };
-
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const editedPost = await dispatch(updatePost({token, slug, articleData: formData})).unwrap();
-      setIsSuccess(true);
+      const editedPost = await updateArticle({token, slug, articleData: formData}).unwrap();
       setTimeout(() => {
-        navigate(`/post/${editedPost.slug}`);
+        navigate(`/post/${editedPost.article.slug}`);
       }, 1000);
     } catch (error) {
       console.error('Failed to update post:', error);
@@ -129,94 +100,103 @@ export const EditPost = () => {
         ...errors,
         title: 'Failed to update post.',
       });
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
     }
   };
-
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Edit article</h1>
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <label className={styles.label}>
-          Title
-          <input
-            autoFocus
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Title"
-            className={`${styles.input} ${errors.title ? styles.inputError : ''}`}
-          />
-          {errors.title && <p className={styles.errorText}>{errors.title}</p>}
-        </label>
-        <label className={styles.label}>
-          Short description
-          <input
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Short description"
-            className={`${styles.input} ${errors.description ? styles.inputError : ''}`}
-          />
-          {errors.description && <p className={styles.errorText}>{errors.description}</p>}
-        </label>
-        <label className={styles.label}>
-          Text
-          <textarea
-            name="body"
-            value={formData.body}
-            onChange={handleChange}
-            placeholder="Text"
-            className={`${styles.textarea} ${errors.body ? styles.inputError : ''}`}
-          />
-          {errors.body && <p className={styles.errorText}>{errors.body}</p>}
-        </label>
-        <div className={styles.tagsContainer}>
-          {formData.tagList.map((tag, index) => (
-            <div key={index} className={styles.tag}>
-              <input
-                type="text"
-                value={tag}
-                onChange={(e) => {
-                  const updatedTags = [...formData.tagList];
-                  updatedTags[index] = e.target.value.slice(0, 12).trim();
-                  setFormData({
-                    ...formData,
-                    tagList: updatedTags,
-                  });
-                }}
-                placeholder="Tag"
-                className={`${styles.tagInput} ${errors.tag && !tag.trim() ? styles.inputError : ''}`}
-              />
-              <button type="button" onClick={() => handleRemoveTag(index)} className={styles.deleteTagButton}>
-                Delete
-              </button>
-              {index === formData.tagList.length - 1 && (
-                <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
-                  Add tag
-                </button>
-              )}
-            </div>
-          ))}
-          {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
-          {!formData.tagList.length && (
-            <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
-              Add tag
-            </button>
-          )}
+      {(isLoading && (
+        <div className={styles.spinner_wrapper}>
+          <Spinner />
         </div>
-        <button
-          type="submit"
-          className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saving...' : isSuccess ? 'Success! Redirecting to post' : 'Save'}
-        </button>
-      </form>
+      )) ||
+        (error && (
+          <div className={styles.error_wrapper}>
+            <ErrorAlert error={error} />
+          </div>
+        )) || (
+          <>
+            <h1 className={styles.title}>Edit article</h1>
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <label className={styles.label}>
+                Title
+                <input
+                  autoFocus
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Title"
+                  className={`${styles.input} ${errors.title ? styles.inputError : ''}`}
+                />
+                {errors.title && <p className={styles.errorText}>{errors.title}</p>}
+              </label>
+              <label className={styles.label}>
+                Short description
+                <input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Short description"
+                  className={`${styles.input} ${errors.description ? styles.inputError : ''}`}
+                />
+                {errors.description && <p className={styles.errorText}>{errors.description}</p>}
+              </label>
+              <label className={styles.label}>
+                Text
+                <textarea
+                  name="body"
+                  value={formData.body}
+                  onChange={handleChange}
+                  placeholder="Text"
+                  className={`${styles.textarea} ${errors.body ? styles.inputError : ''}`}
+                />
+                {errors.body && <p className={styles.errorText}>{errors.body}</p>}
+              </label>
+              <div className={styles.tagsContainer}>
+                {formData.tagList.map((tag, index) => (
+                  <div key={index} className={styles.tag}>
+                    <input
+                      type="text"
+                      value={tag}
+                      onChange={(e) => {
+                        const updatedTags = [...formData.tagList];
+                        updatedTags[index] = e.target.value.slice(0, 12).trim();
+                        setFormData({
+                          ...formData,
+                          tagList: updatedTags,
+                        });
+                      }}
+                      placeholder="Tag"
+                      className={`${styles.tagInput} ${errors.tag && !tag.trim() ? styles.inputError : ''}`}
+                    />
+                    <button type="button" onClick={() => handleRemoveTag(index)} className={styles.deleteTagButton}>
+                      Delete
+                    </button>
+                    {index === formData.tagList.length - 1 && (
+                      <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
+                        Add tag
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {errors.tag && <p className={styles.errorText}>{errors.tag}</p>}
+                {!formData.tagList.length && (
+                  <button type="button" onClick={handleAddTagField} className={styles.addTagButton}>
+                    Add tag
+                  </button>
+                )}
+              </div>
+              <button
+                type="submit"
+                className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
+                disabled={isPending}
+              >
+                {isPending ? 'Saving...' : isSuccess ? 'Success! Redirecting to post' : 'Save'}
+              </button>
+            </form>
+          </>
+        )}
     </div>
   );
 };

@@ -5,14 +5,13 @@ import {LoggedBlock} from './LoggedBlock/LoggedBlock';
 import {useSelector} from 'react-redux';
 
 export const Header = () => {
-  const token = useSelector((state) => state.auth.token);
-  let displayedName = 'RealWorld Blog';
+  const token = useSelector((state) => (state.auth.user ? state.auth.user.token : null));
   return (
     <>
       <div className={style.header}>
         <nav className={style.header__navbar}>
           <Link className={style.link__logo} to="/posts">
-            {displayedName}
+            RealWorld Blog
           </Link>
           {token ? <LoggedBlock /> : <Auth />}
         </nav>

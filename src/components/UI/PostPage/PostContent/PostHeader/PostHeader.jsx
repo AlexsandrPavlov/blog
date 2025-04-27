@@ -5,23 +5,27 @@ import {HeartOutlined, HeartFilled} from '@ant-design/icons';
 import avatar from '../../../../UI/PostsList/Post/avatar.png';
 import {Modal} from 'antd';
 import {ExclamationCircleFilled} from '@ant-design/icons';
-import {useDispatch} from 'react-redux';
-import {deletePost} from '../../../../../store/slice/deletePostSlice';
 import {useNavigate} from 'react-router-dom';
-
 import {useSelector} from 'react-redux';
+import {useDeleteArticleMutation, useLikeArticleMutation, useUnlikeArticleMutation} from '../../../../../api/postApi';
 
 const {confirm} = Modal;
 
-export const PostHeader = (post) => {
-  const {token, user} = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+export const PostHeader = (props) => {
+  const {user} = useSelector((state) => state.auth);
+  const [deleteArticle] = useDeleteArticleMutation();
+  const [likeArticle] = useLikeArticleMutation();
+  const [unLike] = useUnlikeArticleMutation();
   const navigate = useNavigate();
-
-  const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited, clickLikePost} = post;
+  const {title, description, author, createdAt, tagList, favoritesCount, slug, favorited, token} = props;
 
   const handleLikeClick = () => {
-    clickLikePost(slug);
+    if (!favorited) {
+      likeArticle({token, slug});
+    }
+    if (favorited) {
+      unLike({token, slug});
+    }
   };
 
   const handleDel = () => {
@@ -31,7 +35,7 @@ export const PostHeader = (post) => {
       content: 'This action cannot be undone.',
       onOk: async () => {
         try {
-          await dispatch(deletePost({slug, token})).unwrap();
+          await deleteArticle({token, slug});
           navigate('/posts');
         } catch (error) {
           console.error('Failed to delete post:', error);
@@ -39,9 +43,6 @@ export const PostHeader = (post) => {
       },
       onCancel() {},
     });
-  };
-  const handleEdit = () => {
-    navigate('/../post/edit/' + slug);
   };
 
   return (
@@ -80,7 +81,6 @@ export const PostHeader = (post) => {
           {author.image ? <Avatar size={46} src={author.image} /> : <Avatar size={46} src={avatar} />}
         </section>
       </div>
-
       <div className={style.post_content}>
         <p className={style.description_text}>{description}</p>
         {token && user.username === author.username && (
@@ -88,7 +88,12 @@ export const PostHeader = (post) => {
             <button onClick={handleDel} className={`${style.post_header_user_delete} ${style.post_header_user_button}`}>
               Delete
             </button>
-            <button onClick={handleEdit} className={`${style.post_header_user_edit} ${style.post_header_user_button}`}>
+            <button
+              onClick={() => {
+                navigate('/../post/edit/' + slug);
+              }}
+              className={`${style.post_header_user_edit} ${style.post_header_user_button}`}
+            >
               Edit
             </button>
           </div>

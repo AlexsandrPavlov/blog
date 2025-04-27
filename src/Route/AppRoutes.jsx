@@ -17,7 +17,7 @@ export const AppRoutes = () => {
       <Routes>
         <Route index element={<PostList />} />
         <Route path="posts" element={<PostList />} />
-        {/* <Route path="post/:slug" element={<PostPage />} />
+        <Route path="post/:slug" element={<PostPage />} />
         <Route path="*" element={<NotFound />} />
         <Route path="register" element={<Register />} />
         <Route path="login" element={<Auth />} />
@@ -44,7 +44,7 @@ export const AppRoutes = () => {
               <EditPost />
             </PrivateRoute>
           }
-        /> */}
+        />
       </Routes>
     </Router>
   );
