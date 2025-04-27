@@ -1,13 +1,14 @@
 import styles from './AuthStyle.module.css';
 import {useState} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
-import {loginUser, fetchCurrentUser} from '../../../store/slice/authSlice.js';
+import {useDispatch, useSelector} from 'react-redux';
+import {loginUser} from '../../../store/authSlice/authSlice.js';
 
 export const Auth = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+
+  const {loading, logged} = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -70,12 +71,8 @@ export const Auth = () => {
       return;
     }
 
-    setIsLoading(true);
     try {
-      // Используем unwrap для обработки ошибок потому что в случае ошибки мы получим rejectWithValue из за промиса
       await dispatch(loginUser({email: formData.email, password: formData.password})).unwrap();
-      await dispatch(fetchCurrentUser()).unwrap();
-      setIsSuccess(true);
       setTimeout(() => {
         navigate('/posts');
       }, 1000);
@@ -83,19 +80,16 @@ export const Auth = () => {
         email: '',
         password: '',
       });
+      //eslint-disable-next-line
     } catch (error) {
-      console.error('Login failed:', error);
       setErrors({
         ...errors,
-        email: 'Invalid email or password.',
+        password: 'Invalid email or password.',
       });
       setFormData({
         email: formData.email,
         password: '',
       });
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -118,12 +112,8 @@ export const Auth = () => {
             {errors[field.name] && <p className={styles.errorText}>{errors[field.name]}</p>}
           </label>
         ))}
-        <button
-          type="submit"
-          className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Logining...' : isSuccess ? 'Success! Redirect to main page ' : 'Login'}
+        <button type="submit" className={`${styles.button} ${logged ? styles.successButton : ''}`} disabled={loading}>
+          {loading ? 'Logining...' : logged ? 'Success! Redirect to main page ' : 'Login'}
         </button>
       </form>
       <p className={styles.footerText}>

@@ -1,38 +1,33 @@
-import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
 import {Post} from './Post/Post.jsx';
 import style from './PostList.module.css';
-import {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {fetchArticles} from '../../../store/slice/articleSlice.js';
-import {setPage} from '../../../store/slice/paginationSlice.js';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
 import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
+import {useGetArticlesQuery} from '../../../api/postApi.js';
+import {MemoizedPaginationPosts} from '../assets/Pagination/Pagination';
+import {useState} from 'react';
+import {useSelector} from 'react-redux';
 
 export const PostList = () => {
-  const dispatch = useDispatch();
-  const {items: articles, count, loading, error} = useSelector((state) => state.articles);
-  const {currentPage, limit, offset} = useSelector((state) => state.pagination);
+  const token = useSelector((state) => (state.auth.user ? state.auth.user.token : null));
+  const [offset, setOffset] = useState(0);
+  const {data, error, isLoading, isError} = useGetArticlesQuery({limit: 5, offset: offset, token});
 
-  useEffect(() => {
-    dispatch(fetchArticles({limit, offset}));
-  }, [dispatch, limit, offset]);
-
-  const handlePageChange = (offset, page) => {
-    dispatch(setPage({page}));
+  const handlePageChange = (newOffset) => {
+    setOffset(newOffset);
   };
 
   return (
-    (loading && (
+    (isLoading && (
       <div className={style.spinner_wrapper}>
         <Spinner />
       </div>
     )) ||
-    (error && <ErrorAlert error={error} />) || (
+    (isError && <ErrorAlert error={error} />) || (
       <div className={style.posts_wrapper}>
-        {articles.map((article) => (
-          <Post key={article.slug} {...article} />
+        {data.articles.map((article) => (
+          <Post key={article.slug} {...article} token={token} />
         ))}
-        <MemoizedPaginationPosts countPosts={count} handlePageChange={handlePageChange} currentPage={currentPage} />
+        <MemoizedPaginationPosts countPosts={data.articlesCount} handlePageChange={handlePageChange} currentPage={1} />
       </div>
     )
   );

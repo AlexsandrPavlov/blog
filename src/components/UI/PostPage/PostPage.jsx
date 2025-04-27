@@ -1,42 +1,20 @@
 import style from './PostPageStyle.module.css';
 import ReactMarkdown from 'react-markdown';
 import {useParams} from 'react-router-dom';
-import {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Spinner} from '../assets/LoadSpinner/Spinner.jsx';
 import {ErrorAlert} from '../assets/ErrorAlert/ErrorAlert.jsx';
-import {fetchPost} from '../../../store/slice/postSlice.js';
 import {PostHeader} from './PostContent/PostHeader/PostHeader.jsx';
-import {likePost, unlikePost} from '../../../store/slice/postSlice.js';
+import {useGetArticleQuery} from '../../../api/postApi.js';
+import {useSelector} from 'react-redux';
 
 export const PostPage = () => {
   const {slug} = useParams();
-  const dispatch = useDispatch();
-  const {post, loading, error} = useSelector((state) => state.article);
-  const {update} = useSelector((state) => state.editPost);
-
-  useEffect(() => {
-    if (!post || post.slug !== slug) {
-      dispatch(fetchPost(slug));
-    }
-  }, [dispatch, slug, post]);
-
-  const clickLikePost = (slug) => {
-    if (post.favorited) {
-      dispatch(unlikePost({slug}));
-    } else {
-      dispatch(likePost({slug}));
-    }
-  };
-  useEffect(() => {
-    if (update) {
-      dispatch(fetchPost(slug));
-    }
-  }, [update, dispatch, slug]);
+  const token = useSelector((state) => (state.auth.user ? state.auth.user.token : null));
+  const {data, error, isLoading} = useGetArticleQuery({slug, token});
 
   return (
     <div className={style.postPage}>
-      {(loading && (
+      {(isLoading && (
         <div className={style.spinner_wrapper}>
           <Spinner />
         </div>
@@ -46,11 +24,11 @@ export const PostPage = () => {
             <ErrorAlert error={error} />
           </div>
         )) ||
-        (post && (
+        (data && (
           <>
-            <PostHeader {...post} clickLikePost={clickLikePost} />
+            <PostHeader {...data.article} token={token} />
             <div className={style.post_mardown}>
-              <ReactMarkdown>{post.body}</ReactMarkdown>
+              <ReactMarkdown>{data.article.body}</ReactMarkdown>
             </div>
           </>
         ))}

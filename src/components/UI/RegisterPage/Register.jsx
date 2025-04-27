@@ -1,16 +1,16 @@
 import styles from './RegisterStyle.module.css';
 import {useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {registerUser} from '../../../store/slice/registerSlice.js';
+import {useDispatch, useSelector} from 'react-redux';
+import {registerUser} from '../../../store/authSlice/authSlice.js';
 import {Link} from 'react-router-dom';
 import {useNavigate} from 'react-router-dom';
 
 export const Register = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const navigate = useNavigate();
+  const loading = useSelector((state) => state.auth.loading);
+  const logged = useSelector((state) => state.auth.logged);
 
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -18,7 +18,6 @@ export const Register = () => {
     confirmPassword: '',
     agreeToTerms: false,
   });
-
   const [errors, setErrors] = useState({
     username: '',
     email: '',
@@ -26,7 +25,6 @@ export const Register = () => {
     confirmPassword: '',
     agreeToTerms: '',
   });
-
   const fields = [
     {
       name: 'username',
@@ -66,47 +64,37 @@ export const Register = () => {
       validation: (value) => (value !== formData.password ? 'Passwords do not match.' : ''),
     },
   ];
-
   const handleChange = (e) => {
     const {name, value, type, checked} = e.target;
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
     });
-
     setErrors({
       ...errors,
       [name]: '',
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = fields.reduce((acc, field) => {
       acc[field.name] = field.validation(formData[field.name]);
       return acc;
     }, {});
-
     newErrors.agreeToTerms = !formData.agreeToTerms ? 'You must agree to the terms.' : '';
-
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
 
-    setIsLoading(true);
     try {
       await dispatch(
         registerUser({username: formData.username, email: formData.email, password: formData.password})
       ).unwrap();
 
-      setIsSuccess(true);
       setTimeout(() => {
-        navigate('/login');
+        navigate('/posts');
       }, 1000);
-
       setFormData({
         username: '',
         email: '',
@@ -127,11 +115,8 @@ export const Register = () => {
           email: `Email '${formData.email}' ${error.email}`,
         }));
       }
-    } finally {
-      setIsLoading(false);
     }
   };
-
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Create new account</h1>
@@ -162,13 +147,8 @@ export const Register = () => {
           {`I agree to the processing of my personal information`}
           {errors.agreeToTerms && <p className={styles.errorText}>{errors.agreeToTerms}</p>}
         </label>
-
-        <button
-          type="submit"
-          className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Creating...' : isSuccess ? 'Success! Redirect to login ' : 'Create'}
+        <button type="submit" className={`${styles.button} ${loading ? styles.successButton : ''}`} disabled={loading}>
+          {loading ? 'Creating...' : logged ? 'Success! Redirect to login ' : 'Create'}
         </button>
       </form>
       <p className={styles.footerText}>

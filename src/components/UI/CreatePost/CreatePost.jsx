@@ -1,15 +1,14 @@
 import styles from './CreatePostStyle.module.css';
 import {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {createPost} from '../../../store/slice/newPostSlice.js';
+
+import {useCreateArticleMutation} from '../../../api/postApi.js';
 
 export const CreatePost = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const dispatch = useDispatch();
+  const token = useSelector((state) => (state.auth.user ? state.auth.user.token : null));
+  const [createArticle, {isLoading, isSuccess}] = useCreateArticleMutation();
   const navigate = useNavigate();
-  const {token} = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -17,17 +16,14 @@ export const CreatePost = () => {
     body: '',
     tagList: [],
   });
-
   const [errors, setErrors] = useState({
     title: '',
     description: '',
     body: '',
     tag: '',
   });
-
   const handleChange = (e) => {
     const {name, value} = e.target;
-
     if (name === 'description' && value.length > 240) {
       setErrors({
         ...errors,
@@ -46,20 +42,17 @@ export const CreatePost = () => {
       ...formData,
       [name]: value,
     });
-
     setErrors({
       ...errors,
       [name]: '',
     });
   };
-
   const handleAddTagField = () => {
     setFormData({
       ...formData,
       tagList: [...formData.tagList, ''],
     });
   };
-
   const handleRemoveTag = (index) => {
     const updatedTags = formData.tagList.filter((_, i) => i !== index);
     setFormData({
@@ -71,10 +64,8 @@ export const CreatePost = () => {
       tag: '',
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = {
       title: !formData.title.trim()
         ? 'Title is required.'
@@ -89,32 +80,24 @@ export const CreatePost = () => {
       body: !formData.body.trim() ? 'Text is required.' : '',
       tag: formData.tagList.some((tag) => !tag.trim()) ? 'Tags cannot be empty.' : '',
     };
-
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const createdPost = await dispatch(createPost({token, articleData: formData})).unwrap();
-      setIsSuccess(true);
+      const createdPost = await createArticle({token, articleData: formData}).unwrap();
       setTimeout(() => {
-        navigate(`/post/${createdPost.slug}`);
+        navigate(`/post/${createdPost.article.slug}`);
       }, 1000);
+      // eslint-disable-next-line
     } catch (error) {
-      console.error('Failed to create post:', error);
       setErrors({
         ...errors,
         title: 'Failed to create post.',
       });
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
     }
   };
-
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Create new article</h1>
@@ -163,7 +146,7 @@ export const CreatePost = () => {
                 value={tag}
                 onChange={(e) => {
                   const updatedTags = [...formData.tagList];
-                  updatedTags[index] = e.target.value.slice(0, 12).trim(); // Ограничиваем длину тега до 12 символов
+                  updatedTags[index] = e.target.value.slice(0, 12).trim();
                   setFormData({
                     ...formData,
                     tagList: updatedTags,

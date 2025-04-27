@@ -1,10 +1,9 @@
 import styles from './LoggedBlockStyle.module.css';
 import {Link, useNavigate} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
-import {logout} from '../../../../../store/slice/authSlice';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Avatar} from 'antd';
-import avatar from '../../../PostsList/Post/avatar.png';
+import avatar from '../../PostsList/Post/avatar.png';
+import {logout} from '../../../../store/authSlice/authSlice';
 
 export const LoggedBlock = () => {
   const dispatch = useDispatch();

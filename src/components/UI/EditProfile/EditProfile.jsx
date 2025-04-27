@@ -2,15 +2,14 @@ import styles from './EditProfileStyle.module.css';
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchCurrentUser} from '../../../store/slice/authSlice.js';
-import {editUserProfile} from '../../../store/slice/editProfileSlice.js';
+import {fetchCurrentUser, editUserProfile} from '../../../store/authSlice/authSlice.js';
 
 export const EditProfile = () => {
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+
   const navigate = useNavigate();
-  const {token, user} = useSelector((state) => state.auth);
+  const {user, loading, logged} = useSelector((state) => state.auth);
+  const token = user.token;
 
   const [formData, setFormData] = useState({
     username: user.username || '',
@@ -18,14 +17,12 @@ export const EditProfile = () => {
     password: '',
     image: user.image || '',
   });
-
   const [errors, setErrors] = useState({
     username: '',
     email: '',
     password: '',
     image: '',
   });
-
   const fields = [
     {
       name: 'username',
@@ -70,40 +67,30 @@ export const EditProfile = () => {
       },
     },
   ];
-
   const handleChange = (e) => {
     const {name, value} = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-
     setErrors({
       ...errors,
       [name]: '',
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = fields.reduce((acc, field) => {
       acc[field.name] = field.validation(formData[field.name]);
       return acc;
     }, {});
-
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) {
       return;
     }
-
-    setIsLoading(true);
     try {
-      // Отправляем обновлённые данные пользователя
       await dispatch(editUserProfile({token, userData: formData})).unwrap();
       await dispatch(fetchCurrentUser()).unwrap();
-      setIsSuccess(true);
       setTimeout(() => {
         navigate('/posts');
       }, 1000);
@@ -113,12 +100,8 @@ export const EditProfile = () => {
         ...errors,
         username: 'Failed to update profile.',
       });
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
     }
   };
-
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Edit profile</h1>
@@ -138,12 +121,8 @@ export const EditProfile = () => {
             {errors[field.name] && <p className={styles.errorText}>{errors[field.name]}</p>}
           </label>
         ))}
-        <button
-          type="submit"
-          className={`${styles.button} ${isSuccess ? styles.successButton : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Saving...' : isSuccess ? 'Success! Redirect 3 s to posts ' : 'Save'}
+        <button type="submit" className={`${styles.button} ${logged ? styles.successButton : ''}`} disabled={loading}>
+          {loading ? 'Saving...' : loading ? 'Success! Redirect 3 s to posts ' : 'Save'}
         </button>
       </form>
     </div>

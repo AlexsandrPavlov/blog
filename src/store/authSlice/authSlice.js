@@ -1,13 +1,11 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {login, getCurrentUser} from '../../components/api/api.js';
+import {login, getCurrentUser, register, updateUser} from '../../api/userApi.js';
 
 export const loginUser = createAsyncThunk('auth/login', async ({email, password}, thunkAPI) => {
   try {
     const response = await login(email, password);
     const user = response.data.user;
-    localStorage.setItem('token', user.token);
     localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('loginTime', Date.now());
     return user;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data.errors);
@@ -26,34 +24,40 @@ export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async 
     return thunkAPI.rejectWithValue(error.response.data.errors || 'Failed to fetch user');
   }
 });
+export const registerUser = createAsyncThunk('auth/register', async ({username, email, password}, thunkAPI) => {
+  try {
+    const response = await register(username, email, password);
+    const user = response.data.user;
+    localStorage.setItem('user', JSON.stringify(user));
+    return user;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.errors);
+  }
+});
+export const editUserProfile = createAsyncThunk('user/editProfile', async ({token, userData}, thunkAPI) => {
+  try {
+    const response = await updateUser(token, userData);
+    const user = response.data.user;
+    localStorage.setItem('user', JSON.stringify(user));
+    return user;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data.errors || 'Failed to update profile');
+  }
+});
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: JSON.parse(localStorage.getItem('user')) || null,
-    token: localStorage.getItem('token') || null,
     loading: false,
     error: null,
+    logged: false,
   },
   reducers: {
     logout(state) {
       state.user = null;
-      state.token = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      localStorage.removeItem('loginTime');
-      localStorage.removeItem('image');
-    },
-    checkSession(state) {
-      const loginTime = localStorage.getItem('loginTime');
-      if (loginTime && Date.now() - loginTime > 3600000) {
-        state.user = null;
-        state.token = null;
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('loginTime');
-        localStorage.removeItem('image');
-      }
     },
   },
   extraReducers: (builder) => {
@@ -61,15 +65,17 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.logged = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.token = action.payload.token;
+        state.logged = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.logged = false;
       })
       .addCase(fetchCurrentUser.pending, (state) => {
         state.loading = true;
@@ -80,6 +86,33 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.logged = false;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.logged = true;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.logged = false;
+      })
+      .addCase(editUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(editUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(editUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
